@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Malla Derecho UCEN - Interactiva</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f8f9fa;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .semestres {
+      display: flex;
+      flex-direction: row;
+      overflow-x: auto;
+    }
+    .semestre {
+      min-width: 220px;
+      margin-right: 20px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    }
+    .semestre h2 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .ramo {
+      display: block;
+      margin: 5px 0;
+      padding: 8px;
+      border-radius: 6px;
+      background: #e3f2fd;
+      cursor: pointer;
+      border: 1px solid #bbb;
+    }
+    .ramo.tachado {
+      text-decoration: line-through;
+      background-color: #c8e6c9 !important;
+      cursor: default;
+    }
+    .ramo.bloqueado {
+      background-color: #ececec !important;
+      color: #888;
+      cursor: not-allowed;
+    }
+    .boton-reiniciar {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .civil { background: #e3f2fd; }
+    .procesal { background: #fce4ec; }
+    .constitucional { background: #fff3e0; }
+    .penal { background: #f3e5f5; }
+    .econ { background: #e8f5e9; }
+    .general { background: #ede7f6; }
+    .electivo { background: #e0f2f1; }
+  </style>
+</head>
+<body>
+
+  <h1>Malla Derecho UCEN (Interactiva)</h1>
+  <button class="boton-reiniciar" onclick="reiniciarMalla()">Reiniciar Malla</button>
+  <div class="semestres" id="malla"></div>
+
+  <script>
+    const data = 
+[
+  { "semestre": 1, "ramos": [
+    { "id": "intro_civil", "nombre": "Introducción al Derecho Civil", "clase": "civil" },
+    { "id": "romano", "nombre": "Derecho Romano", "clase": "general" },
+    { "id": "historia", "nombre": "Historia del Derecho", "clase": "general" },
+    { "id": "eco1", "nombre": "Derecho Económico I", "clase": "econ" },
+    { "id": "discursivas", "nombre": "Taller de Competencias Discursivas", "clase": "general" },
+    { "id": "metodologia", "nombre": "Taller Técnicas y Metodologías", "clase": "general" }
+  ]},
+  { "semestre": 2, "ramos": [
+    { "id": "civil1", "nombre": "Derecho Civil I", "deps": ["intro_civil"], "clase": "civil" },
+    { "id": "procesal1", "nombre": "Derecho Procesal I", "clase": "procesal" },
+    { "id": "politico", "nombre": "Derecho Político", "clase": "constitucional" },
+    { "id": "eco2", "nombre": "Derecho Económico II", "deps": ["eco1"], "clase": "econ" },
+    { "id": "transv1", "nombre": "Transversal Institucional I", "clase": "general" },
+    { "id": "taller2", "nombre": "Taller", "clase": "general" }
+  ]},
+  { "semestre": 3, "ramos": [
+    { "id": "civil2", "nombre": "Derecho Civil II", "deps": ["civil1"], "clase": "civil" },
+    { "id": "procesal2", "nombre": "Derecho Procesal II", "deps": ["procesal1"], "clase": "procesal" },
+    { "id": "hist_const", "nombre": "Historia Constitucional", "deps": ["politico"], "clase": "constitucional" },
+    { "id": "int_pub", "nombre": "Derecho Internacional Público", "clase": "general" },
+    { "id": "taller3", "nombre": "Taller", "clase": "general" }
+  ]},
+  { "semestre": 4, "ramos": [
+    { "id": "civil3", "nombre": "Derecho Civil III", "deps": ["civil2"], "clase": "civil" },
+    { "id": "procesal3", "nombre": "Derecho Procesal III", "deps": ["procesal2"], "clase": "procesal" },
+    { "id": "const1", "nombre": "Derecho Constitucional I", "deps": ["hist_const"], "clase": "constitucional" },
+    { "id": "penal1", "nombre": "Derecho Penal I", "clase": "penal" },
+    { "id": "taller4", "nombre": "Taller", "clase": "general" }
+  ]},
+  { "semestre": 5, "ramos": [
+    { "id": "civil4", "nombre": "Derecho Civil IV", "deps": ["civil3"], "clase": "civil" },
+    { "id": "procesal4", "nombre": "Derecho Procesal IV", "deps": ["procesal3"], "clase": "procesal" },
+    { "id": "const2", "nombre": "Derecho Constitucional II", "deps": ["const1"], "clase": "constitucional" },
+    { "id": "penal2", "nombre": "Derecho Penal II", "deps": ["penal1"], "clase": "penal" },
+    { "id": "taller5", "nombre": "Taller", "clase": "general" }
+  ]},
+  { "semestre": 6, "ramos": [
+    { "id": "civil5", "nombre": "Derecho Civil V", "deps": ["civil4"], "clase": "civil" },
+    { "id": "procesal5", "nombre": "Derecho Procesal V", "deps": ["procesal4"], "clase": "procesal" },
+    { "id": "adm", "nombre": "Derecho Administrativo", "deps": ["const2"], "clase": "constitucional" },
+    { "id": "penal3", "nombre": "Derecho Penal III", "deps": ["penal2"], "clase": "penal" },
+    { "id": "taller6", "nombre": "Taller", "clase": "general" }
+  ]},
+  { "semestre": 7, "ramos": [
+    { "id": "civil6", "nombre": "Derecho Civil VI", "deps": ["civil5"], "clase": "civil" },
+    { "id": "procesal6", "nombre": "Derecho Procesal VI", "deps": ["procesal5"], "clase": "procesal" },
+    { "id": "eco3", "nombre": "Derecho Económico III", "deps": ["eco2"], "clase": "econ" },
+    { "id": "comercial", "nombre": "Derecho Comercial", "deps": ["civil3"], "clase": "civil" },
+    { "id": "trabajo", "nombre": "Derecho del Trabajo", "deps": ["procesal3"], "clase": "general" },
+    { "id": "transv2", "nombre": "Transversal Institucional II", "clase": "general" }
+  ]},
+  { "semestre": 8, "ramos": [
+    { "id": "civil7", "nombre": "Derecho Civil VII", "deps": ["civil6"], "clase": "civil" },
+    { "id": "tributario", "nombre": "Derecho Tributario", "deps": ["eco3"], "clase": "econ" },
+    { "id": "seg_social", "nombre": "Derecho Seguridad Social", "deps": ["trabajo"], "clase": "general" },
+    { "id": "sociedades", "nombre": "Derecho de Sociedades", "deps": ["comercial"], "clase": "civil" },
+    { "id": "electivo1", "nombre": "Electivo de Área I", "clase": "electivo" },
+    { "id": "electivo2", "nombre": "Electivo de Área II", "clase": "electivo" }
+  ]},
+  { "semestre": 9, "ramos": [
+    { "id": "tesis", "nombre": "Seminario de Tesis", "deps": ["procesal6", "civil7"], "clase": "general" },
+    { "id": "integrativo1", "nombre": "Seminario Integrativo I", "deps": ["procesal5", "civil5"], "clase": "general" },
+    { "id": "clinica1", "nombre": "Clínica Jurídica I", "deps": ["procesal5", "civil6"], "clase": "general" },
+    { "id": "electivo3", "nombre": "Electivo de Área III", "clase": "electivo" },
+    { "id": "electivo4", "nombre": "Electivo de Área IV", "clase": "electivo" }
+  ]},
+  { "semestre": 10, "ramos": [
+    { "id": "integrativo2", "nombre": "Seminario Integrativo II", "deps": ["integrativo1"], "clase": "general" },
+    { "id": "filo", "nombre": "Fundamentos Filosóficos del Derecho", "clase": "general" },
+    { "id": "clinica2", "nombre": "Clínica Jurídica II", "deps": ["clinica1"], "clase": "general" },
+    { "id": "electivo5", "nombre": "Electivo de Área V", "clase": "electivo" },
+    { "id": "electivo6", "nombre": "Electivo de Área VI", "clase": "electivo" }
+  ]},
+  { "semestre": 11, "ramos": [
+    { "id": "licenciatura", "nombre": "Licenciatura", "clase": "general" }
+  ]}
+]
+;
+
+    const contenedor = document.getElementById("malla");
+
+    data.forEach(bloque => {
+      const div = document.createElement("div");
+      div.classList.add("semestre");
+      const titulo = document.createElement("h2");
+      titulo.textContent = `Semestre ${bloque.semestre}`;
+      div.appendChild(titulo);
+      bloque.ramos.forEach(r => {
+        const ramo = document.createElement("div");
+        ramo.className = `ramo ${r.clase || ''}`;
+        ramo.id = r.id;
+        ramo.textContent = r.nombre;
+        if (r.deps) ramo.dataset.deps = r.deps.join(',');
+        if (localStorage.getItem(r.id) === '1') ramo.classList.add('tachado');
+        div.appendChild(ramo);
+      });
+      contenedor.appendChild(div);
+    });
+
+    function actualizar() {
+      document.querySelectorAll('.ramo').forEach(ramo => {
+        const deps = ramo.dataset.deps?.split(',') || [];
+        const puedeDesbloquear = deps.length === 0 || deps.every(id => document.getElementById(id)?.classList.contains('tachado'));
+        if (!ramo.classList.contains('tachado')) {
+          ramo.classList.toggle('bloqueado', !puedeDesbloquear);
+        }
+      });
+    }
+
+    document.querySelectorAll('.ramo').forEach(ramo => {
+      ramo.addEventListener('click', () => {
+        if (ramo.classList.contains('bloqueado') || ramo.classList.contains('tachado')) return;
+        ramo.classList.add('tachado');
+        localStorage.setItem(ramo.id, '1');
+        actualizar();
+      });
+    });
+
+    function reiniciarMalla() {
+      document.querySelectorAll('.ramo').forEach(r => {
+        r.classList.remove('tachado');
+        r.classList.remove('bloqueado');
+        localStorage.removeItem(r.id);
+      });
+      actualizar();
+    }
+
+    actualizar();
+  </script>
+
+</body>
+</html>
